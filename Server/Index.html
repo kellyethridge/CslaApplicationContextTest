@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Csla ApplicationContext Tests</title>
+    <script src="/Scripts/jquery-3.4.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#RunButton").click(function () {
+                $("#success").text("Sending request...");
+                $.get("https://localhost:44301/api/Login", function(result) {
+                        $("#success").text(`${result.name}: ${result.isCorrect}`);
+                    }
+                );
+            });
+        });
+    </script>
+</head>
+<body>
+<button id="RunButton">Run</button>
+<span id="success"></span>
+</body>
+</html>
