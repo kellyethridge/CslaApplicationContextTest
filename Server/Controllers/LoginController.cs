@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Web.Http;
+using Csla;
 using Server.Models;
 
 namespace Server.Controllers
@@ -9,13 +11,25 @@ namespace Server.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> Get()
         {
-            var obj = await ManagerIdentity.GetAsync("Bob");
-
-            return Ok(new
+            try
             {
-                name = obj.Name,
-                isCorrect = obj.FetchIsCorrect
-            });
+                var obj = await ManagerIdentity.GetAsync("Bob");
+
+                return Ok(new
+                {
+                    name = obj.Name,
+                    isCorrect = obj.FetchIsCorrect
+                });
+            }
+            catch (DataPortalException ex)
+            {
+                Debug.WriteLine(ex);
+                return Ok(new
+                {
+                    name="Error",
+                    isCorrect = false
+                });
+            }
         }
     }
 }
