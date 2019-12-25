@@ -15,6 +15,17 @@ namespace Server
         private const string _localContextName = "Csla.LocalContext";
         private const string _clientContextName = "Csla.ClientContext";
         private const string _globalContextName = "Csla.GlobalContext";
+        private static readonly AsyncLocal<HttpContext> AsyncHttpContext = new AsyncLocal<HttpContext>();
+
+        public AsyncLocalWebContextManager(HttpApplication httpApplication)
+        {
+            httpApplication.BeginRequest += HttpApplication_BeginRequest;
+        }
+
+        private void HttpApplication_BeginRequest(object sender, EventArgs e)
+        {
+            HttpContext = HttpContext.Current;
+        }
 
         /// <summary>
         /// Gets a value indicating whether this
@@ -23,7 +34,7 @@ namespace Server
         /// </summary>
         public bool IsValid
         {
-            get { return AsyncHelper.HttpContext != null; }
+            get { return HttpContext != null; }
         }
 
         /// <summary>
@@ -31,7 +42,7 @@ namespace Server
         /// </summary>
         public System.Security.Principal.IPrincipal GetUser()
         {
-            var result = AsyncHelper.HttpContext.User;
+            var result = HttpContext.User;
             if (result == null)
             {
                 result = new Csla.Security.UnauthenticatedPrincipal();
@@ -46,7 +57,7 @@ namespace Server
         /// <param name="principal">Principal object.</param>
         public void SetUser(System.Security.Principal.IPrincipal principal)
         {
-            AsyncHelper.HttpContext.User = principal;
+            HttpContext.User = principal;
         }
 
         /// <summary>
@@ -54,7 +65,7 @@ namespace Server
         /// </summary>
         public ContextDictionary GetLocalContext()
         {
-            return (ContextDictionary)AsyncHelper.HttpContext.Items[_localContextName];
+            return (ContextDictionary)HttpContext.Items[_localContextName];
         }
 
         /// <summary>
@@ -63,7 +74,7 @@ namespace Server
         /// <param name="localContext">Local context.</param>
         public void SetLocalContext(ContextDictionary localContext)
         {
-            AsyncHelper.HttpContext.Items[_localContextName] = localContext;
+            HttpContext.Items[_localContextName] = localContext;
         }
 
         /// <summary>
@@ -71,7 +82,7 @@ namespace Server
         /// </summary>
         public ContextDictionary GetClientContext()
         {
-            return (ContextDictionary)AsyncHelper.HttpContext.Items[_clientContextName];
+            return (ContextDictionary)HttpContext.Items[_clientContextName];
         }
 
         /// <summary>
@@ -80,7 +91,7 @@ namespace Server
         /// <param name="clientContext">Client context.</param>
         public void SetClientContext(ContextDictionary clientContext)
         {
-            AsyncHelper.HttpContext.Items[_clientContextName] = clientContext;
+            HttpContext.Items[_clientContextName] = clientContext;
         }
 
         /// <summary>
@@ -88,7 +99,7 @@ namespace Server
         /// </summary>
         public ContextDictionary GetGlobalContext()
         {
-            return (ContextDictionary)AsyncHelper.HttpContext.Items[_globalContextName];
+            return (ContextDictionary)HttpContext.Items[_globalContextName];
         }
 
         /// <summary>
@@ -97,7 +108,7 @@ namespace Server
         /// <param name="globalContext">Global context.</param>
         public void SetGlobalContext(ContextDictionary globalContext)
         {
-            AsyncHelper.HttpContext.Items[_globalContextName] = globalContext;
+            HttpContext.Items[_globalContextName] = globalContext;
         }
 
         /// <summary>
@@ -139,19 +150,10 @@ namespace Server
             Csla.ApplicationContext.LocalContext["__sps"] = scope;
         }
 
-        public static class AsyncHelper
+        private static HttpContext HttpContext
         {
-            private static readonly AsyncLocal<HttpContext> AsyncHttpContext = new AsyncLocal<HttpContext>();
-
-            public static HttpContext HttpContext
-            {
-                get => AsyncHttpContext.Value;
-                set
-                {
-                    Debug.WriteLine($"Thread Id: {Thread.CurrentThread.ManagedThreadId}");
-                    AsyncHttpContext.Value = value;
-                }
-            }
+            get => AsyncHttpContext.Value;
+            set => AsyncHttpContext.Value = value;
         }
     }
 }

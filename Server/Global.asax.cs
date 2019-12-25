@@ -12,12 +12,12 @@ namespace Server
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
-            ApplicationContext.WebContextManager = new AsyncLocalWebContextManager();
         }
 
-        protected void Application_BeginRequest()
+        public override void Init()
         {
-            AsyncLocalWebContextManager.AsyncHelper.HttpContext = Context;
+            base.Init();
+            ApplicationContext.WebContextManager = new AsyncLocalWebContextManager(this);
         }
     }
 }
