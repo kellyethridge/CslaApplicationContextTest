@@ -26,7 +26,7 @@ namespace Server.Models
 
         public static async Task<ManagerIdentity> GetAsync(string name)
         {
-            ApplicationContext.ClientContext["Name"] = "Bob";
+            ApplicationContext.ClientContext["Name"] = name;
             return await DataPortal.FetchAsync<ManagerIdentity>(name);
         }
     }

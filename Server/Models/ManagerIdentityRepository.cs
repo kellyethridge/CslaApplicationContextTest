@@ -6,17 +6,19 @@ namespace Server.Models
 {
     public class ManagerIdentityRepository : ObjectFactory
     {
-        public async Task<object> Fetch(string name)
+        public async Task<object> Fetch(string criteriaName)
         {
-            var s = ApplicationContext.ClientContext["Name"] as string;
+            await Task.Delay(10);
+
+            var clientName = ApplicationContext.ClientContext["Name"] as string;
+            var userName = ApplicationContext.User.Identity.Name;
 
             var obj = new ManagerIdentity
             {
-                Name = name,
-                FetchIsCorrect = name == s
+                Name = $"Criteria: {criteriaName}, ClientContext: {clientName} , User: {userName}",
+                FetchIsCorrect = criteriaName == clientName
             };
 
-            await Task.Delay(1);
             return obj;
         }
     }

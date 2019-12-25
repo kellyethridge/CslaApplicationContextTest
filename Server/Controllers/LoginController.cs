@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Csla;
@@ -13,7 +15,10 @@ namespace Server.Controllers
         {
             try
             {
-                var obj = await ManagerIdentity.GetAsync("Bob");
+                ApplicationContext.User = new MyPrincipal();
+                var threadId = Thread.CurrentThread.ManagedThreadId.ToString();
+
+                var obj = await ManagerIdentity.GetAsync(threadId);
 
                 return Ok(new
                 {
@@ -21,12 +26,12 @@ namespace Server.Controllers
                     isCorrect = obj.FetchIsCorrect
                 });
             }
-            catch (DataPortalException ex)
+            catch (Exception ex)
             {
                 Debug.WriteLine(ex);
                 return Ok(new
                 {
-                    name="Error",
+                    name = "Error",
                     isCorrect = false
                 });
             }

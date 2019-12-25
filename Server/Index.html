@@ -7,9 +7,10 @@
     <script type="text/javascript">
         $(document).ready(function(){
             $("#RunButton").click(function () {
+                console.log("sending request...");
                 $("#success").text("Sending request...");
                 $.get("https://localhost:44301/api/Login", function(result) {
-                        $("#success").text(`${result.name}: ${result.isCorrect}`);
+                        $("#success").text(`names = ${result.name}: correct flow = ${result.isCorrect}`);
                     }
                 );
             });

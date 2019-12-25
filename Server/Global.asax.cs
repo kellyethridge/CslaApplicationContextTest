@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
+using Csla;
 
 namespace Server
 {
@@ -11,6 +12,12 @@ namespace Server
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            ApplicationContext.WebContextManager = new AsyncLocalWebContextManager();
+        }
+
+        protected void Application_BeginRequest()
+        {
+            AsyncLocalWebContextManager.AsyncHelper.HttpContext = Context;
         }
     }
 }
